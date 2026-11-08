@@ -1,0 +1,38 @@
+{
+  "rev": 0,
+  "profile": {
+    "name": "Suhanraj Thirumal",
+    "tagline": "",
+    "about": "Hi! My name is Suhanraj, most people call me Suhan. \n\nI study Math at Georgia Tech. I have a wide and varied amount of interests outside of that. I am interested in the application of AI into households, low level physics and our understanding of it, interesting characters through history (nijinsky, van gogh, da vinci), and the application of physical AI and robotics into every industry possible. \n\nI become obsessed with new topics every few months, and I believe that gives me a unique perspective on every topic I come across. Also making me a pretty good dinner guest :)",
+    "email": "",
+    "avatar": ""
+  },
+  "links": [
+    {
+      "platform": "x",
+      "handle": "suhanthiru1925",
+      "url": "https://x.com/suhanthiru1925"
+    },
+    {
+      "platform": "linkedin",
+      "handle": "Suhanraj Thirumal",
+      "url": ""
+    },
+    {
+      "platform": "instagram",
+      "handle": "suhanthiru",
+      "url": "https://www.instagram.com/suhanthiru"
+    }
+  ],
+  "timeline": [
+    {
+      "when": "Jan 2026",
+      "title": "Started at Georgia Tech",
+      "detail": "",
+      "current": true
+    }
+  ],
+  "projects": [],
+  "essays": [],
+  "photos": {}
+}

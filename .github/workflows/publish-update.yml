@@ -1,0 +1,77 @@
+# Publishes changes made on /post/ (about me, timeline, social, posts, projects, essays, photos).
+# The editor's key can only open issues and comment. It sends each update as numbered
+# comments on an issue; this workflow applies it to content.json, posts.json and images/,
+# and refuses to commit a change to any other file. Site code changes go through git.
+name: Publish site update
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: write
+  issues: write
+  pages: write
+
+concurrency:
+  group: publish-site-update
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: >-
+      !github.event.issue.pull_request &&
+      github.event.issue.user.login == github.repository_owner &&
+      github.event.comment.user.login == github.repository_owner &&
+      contains(github.event.issue.body, '<!-- site-update -->') &&
+      startsWith(github.event.comment.body, '<!-- site-final ')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Apply the update
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          REPO: ${{ github.repository }}
+          OWNER: ${{ github.repository_owner }}
+        run: node .github/scripts/apply-update.mjs
+
+      - name: Commit content files and nothing else
+        run: |
+          changes="$(git status --porcelain --untracked-files=all)"
+          if [ -z "$changes" ]; then echo "Nothing changed."; exit 0; fi
+          echo "$changes"
+          if echo "$changes" | grep -vqE '^( M|\?\?| D) (content\.json|posts\.json|images/[A-Za-z0-9_-]+\.jpg)$'; then
+            echo "Only content.json, posts.json and images/ may change, so nothing was published." > "$RUNNER_TEMP/update-error.txt"
+            exit 1
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A .
+          git commit -m "Publish site update from issue #${{ github.event.issue.number }}"
+          for attempt in 1 2 3; do
+            git push && exit 0
+            git pull --rebase
+          done
+          echo "Couldn't push the update." > "$RUNNER_TEMP/update-error.txt"
+          exit 1
+
+      - name: Ask GitHub Pages to rebuild
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api -X POST "repos/${{ github.repository }}/pages/builds" > /dev/null
+
+      - name: Close the issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh issue close "${{ github.event.issue.number }}" --repo "${{ github.repository }}" --comment "Published."
+
+      - name: Report a problem
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          reason="$(cat "$RUNNER_TEMP/update-error.txt" 2>/dev/null || echo 'See the workflow log for details.')"
+          gh issue comment "${{ github.event.issue.number }}" --repo "${{ github.repository }}" --body "Not published: $reason"

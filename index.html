@@ -178,22 +178,10 @@ footer a { color: var(--muted); }
 </div>
 <dialog class="lightbox" id="lightbox"><img alt="" id="lb-img"><p id="lb-cap"></p></dialog>
 
-<!-- ============================================================
-     SITE CONTENT. Edit it with the Site Editor artifact and download
-     a fresh index.html, or edit this JSON by hand.
-     ============================================================ -->
-<script type="application/json" id="site-content">{"profile":{"name":"Suhanraj Thirumal ","tagline":"","about":"Hi! My name is Suhanraj, most people call me Suhan. \n\nI study Math at Georgia Tech. I have a wide and varied amount of interests outside of that. I am interested in the application of AI into households, low level physics and our understanding of it, interesting characters through history (nijinsky, van gogh, da vinci), and the application of physical AI and robotics into every industry possible. \n\nI become obsessed with new topics every few months, and I believe that gives me a unique perspective on every topic I come across. Also making me a pretty good dinner guest :)","email":"","avatar":""},"links":[{"platform":"x","handle":"suhanthiru1925","url":"https://x.com/suhanthiru1925"},{"platform":"linkedin","handle":"Suhanraj Thirumal","url":"https://www.linkedin.com/in/Suhanraj Thirumal"},{"platform":"instagram","handle":"suhanthiru","url":"https://www.instagram.com/suhanthiru"}],"timeline":[{"when":"Jan 2026","title":"Started at Georgia Tech","detail":"","current":true}],"posts":[],"projects":[],"essays":[],"photos":{}}</script>
-
 <script>
-const C = (() => { try { return JSON.parse(document.getElementById("site-content").textContent); } catch (e) { return {}; } })();
-const PROFILE = C.profile || {};
-const LINKS = C.links || [];
-const TIMELINE = C.timeline || [];
-let POSTS = C.posts || [];
-let postsLoaded = false;
-const PROJECTS = C.projects || [];
-const ESSAYS = C.essays || [];
-const PHOTOS = C.photos || {};
+/* Content lives in content.json and posts.json, published from /post/. */
+let PROFILE = {}, LINKS = [], TIMELINE = [], POSTS = [], PROJECTS = [], ESSAYS = [], PHOTOS = {};
+let loaded = false, loadFailed = false;
 
 const PLATFORMS = {
   linkedin: "LinkedIn", x: "X", instagram: "Instagram", threads: "Threads", bluesky: "Bluesky",
@@ -304,6 +292,13 @@ function photoRefs(src) { return new Set([...String(src || "").matchAll(/photo:(
 
 const byDateDesc = (a, b) => (b.date || "").localeCompare(a.date || "");
 const slugOf = (x) => x.slug || x.id;
+const slugify = (t) => (t || "").toLowerCase().normalize("NFKD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 60);
+function addSlugs(list) {
+  const used = new Set();
+  for (const x of list) { let s = slugify(x.title) || x.id, n = 2; const base = s; while (used.has(s)) s = `${base}-${n++}`; used.add(s); x.slug = s; }
+  return list;
+}
+const findBy = (list, key) => list.find(x => x.slug === key) || list.find(x => x.id === key);
 
 function renderHome() {
   const main = el("div", { class: "home-main" },
@@ -351,7 +346,7 @@ function renderFeed() {
     root.append(filters);
   }
   const list = posts.filter(p => state.filter === "all" || (p.source || "other") === state.filter);
-  if (!list.length) root.append(el("p", { class: "empty", text: postsLoaded ? "No posts yet." : "Loading posts…" }));
+  if (!list.length) root.append(el("p", { class: "empty", text: "No posts yet." }));
   for (const p of list) {
     const link = safeUrl(p.url);
     const img = photo(p.photo);
@@ -389,7 +384,7 @@ function renderProjects() {
   return root;
 }
 function renderProject(slug) {
-  const p = PROJECTS.find(x => slugOf(x) === slug);
+  const p = findBy(PROJECTS, slug);
   if (!p) return renderMissing();
   const photos = p.photos || [];
   const used = photoRefs(p.body);
@@ -427,7 +422,7 @@ function renderEssays() {
   return root;
 }
 function renderEssay(slug) {
-  const e = ESSAYS.find(x => slugOf(x) === slug);
+  const e = findBy(ESSAYS, slug);
   if (!e) return renderMissing();
   const cover = photo(e.cover);
   const share = el("button", { type: "button", class: "plain share", onclick: async () => {
@@ -466,6 +461,7 @@ function route() {
   return { nav: "home", node: renderHome() };
 }
 function render() {
+  if (!loaded) { view.replaceChildren(loadFailed ? el("p", { class: "empty", text: "This page couldn't load. Refresh to try again." }) : ""); return; }
   const r = route();
   $("#wrap").classList.toggle("wide", r.nav === "home");
   view.replaceChildren(r.node);
@@ -485,25 +481,29 @@ view.addEventListener("click", (ev) => {
 });
 $("#lightbox").addEventListener("click", () => $("#lightbox").close());
 window.addEventListener("hashchange", () => { window.scrollTo(0, 0); render(); });
-$("#site-name").textContent = PROFILE.name || "";
-const foot = $("#foot");
-foot.append(el("span", { text: "© " + new Date().getFullYear() + " " + (PROFILE.name || "") }));
-for (const l of LINKS) if (safeUrl(l.url)) foot.append(el("a", { href: l.url, rel: "me noopener", text: linkLabel(l.platform) }));
-render();
-
-/* Feed posts published from /post/ live in posts.json. */
-(async () => {
-  try {
-    const r = await fetch("posts.json", { cache: "no-cache" });
-    const extra = r.ok ? await r.json() : [];
-    if (Array.isArray(extra)) {
-      const seen = new Set(POSTS.map(p => p.id).filter(Boolean));
-      POSTS = [...extra.filter(p => p && typeof p.text === "string" && !seen.has(p.id)), ...POSTS];
-    }
-  } catch (e) { /* opened from disk, or offline: show the posts embedded above */ }
-  postsLoaded = true;
-  if (route().nav === "feed") render();
-})();
+function setData(c, posts) {
+  c = c && typeof c === "object" ? c : {};
+  PROFILE = c.profile || {};
+  LINKS = c.links || [];
+  TIMELINE = c.timeline || [];
+  PROJECTS = addSlugs((c.projects || []).filter(x => x && !x.hidden));
+  ESSAYS = addSlugs((c.essays || []).filter(x => x && !x.hidden).sort(byDateDesc));
+  PHOTOS = c.photos || {};
+  POSTS = (Array.isArray(posts) ? posts : []).filter(p => p && typeof p.text === "string");
+  loaded = true;
+  $("#site-name").textContent = PROFILE.name || "";
+  const foot = $("#foot");
+  foot.replaceChildren(el("span", { text: "© " + new Date().getFullYear() + " " + (PROFILE.name || "") }));
+  for (const l of LINKS) if (safeUrl(l.url)) foot.append(el("a", { href: l.url, rel: "me noopener", text: linkLabel(l.platform) }));
+  render();
+}
+/* The editor at /post/ shows unpublished changes by handing them to this page. */
+window.__setSiteData = setData;
+if (!/[?&]preview(=|&|$)/.test(location.search)) {
+  Promise.all(["content.json", "posts.json"].map(f => fetch(f, { cache: "no-cache" }).then(r => r.ok ? r.json() : null)))
+    .then(([c, posts]) => { if (!c) throw new Error("missing content"); setData(c, posts || []); })
+    .catch(() => { loadFailed = true; render(); });
+}
 </script>
 </body>
 </html>
