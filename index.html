@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Suhanraj Thirumal</title>
+<style>
+/* Layout idea: one narrow text column, plain links, no cards. Everything is a list. */
+:root {
+  --bg: #fdfdfc;
+  --fg: #1c1c1b;
+  --muted: #6c6c68;
+  --rule: #e4e4e0;
+  --link: #1d4fa3;
+  --tag: #f0f0ec;
+  --font: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #161615; --fg: #e8e8e4; --muted: #9a9a94; --rule: #2e2e2b; --link: #8fb4f0; --tag: #232321;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #161615; --fg: #e8e8e4; --muted: #9a9a94; --rule: #2e2e2b; --link: #8fb4f0; --tag: #232321;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--fg);
+  font-family: var(--font); font-size: 18px; line-height: 1.6;
+}
+.wrap { max-width: 640px; margin: 0 auto; padding: 48px 20px 96px; }
+a { color: var(--link); text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+a:hover { text-decoration-thickness: 2px; }
+a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible {
+  outline: 2px solid var(--link); outline-offset: 2px;
+}
+header { margin-bottom: 40px; }
+.name { font-size: 22px; font-weight: 600; letter-spacing: -0.01em; margin: 0 0 4px; }
+.name a { color: inherit; text-decoration: none; }
+nav { display: flex; gap: 20px; flex-wrap: wrap; font-size: 16px; }
+nav a { color: var(--muted); text-decoration: none; }
+nav a[aria-current="page"] { color: var(--fg); text-decoration: underline; text-underline-offset: 5px; }
+nav a:hover { color: var(--fg); }
+h1 { font-size: 28px; line-height: 1.25; letter-spacing: -0.015em; margin: 0 0 8px; text-wrap: balance; }
+h2 { font-size: 20px; margin: 36px 0 8px; text-wrap: balance; }
+p { margin: 0 0 1em; }
+.meta { color: var(--muted); font-size: 15px; font-variant-numeric: tabular-nums; }
+.lede { margin-bottom: 32px; }
+ul.rows { list-style: none; margin: 0; padding: 0; }
+.row { padding: 14px 0; border-top: 1px solid var(--rule); display: grid; grid-template-columns: 96px 1fr; gap: 4px 16px; }
+.row:last-child { border-bottom: 1px solid var(--rule); }
+.row .meta { padding-top: 2px; }
+.row .title { font-weight: 600; }
+.row .title a { color: var(--fg); text-decoration: none; }
+.row .title a:hover { color: var(--link); text-decoration: underline; }
+.row .desc { color: var(--muted); font-size: 16px; line-height: 1.5; }
+.post { padding: 18px 0; border-top: 1px solid var(--rule); }
+.post:last-child { border-bottom: 1px solid var(--rule); }
+.post .text { white-space: pre-wrap; margin: 4px 0 6px; }
+.post .head { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+.src { font-family: var(--mono); font-size: 12px; background: var(--tag); padding: 1px 7px; border-radius: 3px; color: var(--muted); }
+.filters { display: flex; gap: 14px; flex-wrap: wrap; font-size: 15px; margin-bottom: 18px; align-items: baseline; }
+.filters button, .linkbtn {
+  background: none; border: 0; padding: 0; font: inherit; color: var(--muted); cursor: pointer;
+  text-decoration: none;
+}
+.filters button[aria-pressed="true"] { color: var(--fg); text-decoration: underline; text-underline-offset: 5px; }
+.filters .spacer { flex: 1; }
+.linkbtn { color: var(--link); text-decoration: underline; text-underline-offset: 3px; }
+form.add { border: 1px solid var(--rule); padding: 16px; margin-bottom: 24px; display: grid; gap: 10px; font-size: 16px; }
+form.add[hidden] { display: none; }
+form.add label { display: grid; gap: 4px; color: var(--muted); font-size: 14px; }
+form.add .two { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+input, textarea, select {
+  font: inherit; font-size: 16px; color: var(--fg); background: var(--bg);
+  border: 1px solid var(--rule); border-radius: 3px; padding: 7px 9px; width: 100%;
+}
+textarea { min-height: 96px; resize: vertical; }
+.btns { display: flex; gap: 16px; align-items: baseline; flex-wrap: wrap; }
+.btn { font: inherit; font-size: 15px; color: var(--bg); background: var(--fg); border: 0; border-radius: 3px; padding: 6px 14px; cursor: pointer; }
+.note { font-size: 14px; color: var(--muted); margin: 0; }
+.prose blockquote { margin: 0 0 1em; padding-left: 16px; border-left: 2px solid var(--rule); color: var(--muted); }
+.prose ul { margin: 0 0 1em; padding-left: 22px; }
+.prose pre { background: var(--tag); padding: 12px 14px; overflow-x: auto; font-family: var(--mono); font-size: 14px; line-height: 1.5; margin: 0 0 1em; }
+.prose code { font-family: var(--mono); font-size: 0.88em; background: var(--tag); padding: 1px 4px; border-radius: 3px; }
+.prose pre code { background: none; padding: 0; }
+.back { font-size: 15px; display: inline-block; margin-bottom: 20px; }
+.tags { display: flex; gap: 6px; flex-wrap: wrap; margin: 6px 0 24px; }
+footer { margin-top: 64px; font-size: 14px; color: var(--muted); }
+@media (max-width: 480px) {
+  body { font-size: 17px; }
+  .wrap { padding-top: 32px; }
+  .row { grid-template-columns: 1fr; }
+  form.add .two { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <p class="name"><a href="#home">Suhanraj Thirumal</a></p>
+    <nav aria-label="Main">
+      <a href="#home" data-nav="home">Who am I</a>
+      <a href="#feed" data-nav="feed">Feed</a>
+      <a href="#projects" data-nav="projects">Projects</a>
+      <a href="#essays" data-nav="essays">Essays</a>
+    </nav>
+  </header>
+  <main id="view"></main>
+  <footer id="foot"></footer>
+</div>
+
+<script>
+/* ============================================================
+   CONTENT. Edit this block and nothing else.
+   Newest posts first. source: "linkedin" | "x" | "other".
+   Essays and project bodies use a small markdown subset:
+   ## heading, **bold**, *italic*, `code`, [text](https://url),
+   > quote, - list, and ``` fenced code.
+   ============================================================ */
+const SITE = {
+  name: "Suhanraj Thirumal",
+  about: [
+    "I'm Suhanraj Thirumal. Most people call me Suhan.",
+    "I study mathematics at Georgia Tech, concentrating in statistics and probability. I'm based in Atlanta and I work on robotics software.",
+    "This site has my short posts from other platforms, my projects, and my essays."
+  ],
+  /* Add LinkedIn and X here once you have the exact URLs, e.g.
+     { label: "LinkedIn", url: "https://www.linkedin.com/in/your-handle" } */
+  links: [
+    { label: "GitHub", url: "https://github.com/suhanthiru1925" }
+  ],
+  email: ""
+};
+
+const POSTS = [
+  { date: "2026-11-08", source: "linkedin", url: "https://www.linkedin.com/",
+    text: "Sample post. Paste the text of a LinkedIn post here with a link to the original, and it appears in the feed with its source." },
+  { date: "2026-11-05", source: "x", url: "https://x.com/",
+    text: "Sample post from X. Short thoughts sit in one chronological list, whichever platform they started on." },
+  { date: "2026-10-30", source: "other", url: "",
+    text: "Sample note with no link. Anything you only want to publish here goes in with source set to other." }
+];
+
+const PROJECTS = [
+  { slug: "bridgebench", title: "BridgeBench", year: "2026",
+    blurb: "Clean-room reimplementation and benchmarking of NASA's ARMADAS assembly planner.",
+    tags: ["robotics", "planning"], url: "",
+    body: "Write-up goes here.\n\n## What it is\n\nReplace this with a description, results, and links." },
+  { slug: "train-mapping", title: "Train mapping", year: "2026",
+    blurb: "Real-time transit pipeline built on GTFS feeds.",
+    tags: ["data", "pipelines"], url: "",
+    body: "Write-up goes here." },
+  { slug: "car-identifier", title: "Car identifier", year: "2026",
+    blurb: "Multi-camera vehicle re-identification.",
+    tags: ["vision"], url: "",
+    body: "Write-up goes here." }
+];
+
+const ESSAYS = [
+  { slug: "sample-essay", title: "Sample essay", date: "2026-11-08",
+    blurb: "Shows how long-form writing is laid out.",
+    body: "This is the first paragraph of an essay. Long pieces use the same narrow column as everything else, so the line length stays comfortable.\n\n## A section heading\n\nParagraphs can contain **bold**, *italic*, `inline code`, and [links](https://example.com).\n\n> A block quote looks like this.\n\n- Lists work\n- Like this\n\n```\ncode blocks\nkeep their spacing\n```\n\nDelete this essay and add your own to the ESSAYS list." }
+];
+/* ============================ end content ============================ */
+
+const SOURCES = { linkedin: "LinkedIn", x: "X", other: "Note" };
+const LS_KEY = "site-local-posts-v1";
+const $ = (s, r = document) => r.querySelector(s);
+const view = $("#view");
+
+function el(tag, attrs = {}, ...kids) {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (k === "class") e.className = v;
+    else if (k === "text") e.textContent = v;
+    else if (k.startsWith("on")) e.addEventListener(k.slice(2), v);
+    else if (v !== false && v != null) e.setAttribute(k, v === true ? "" : v);
+  }
+  for (const k of kids.flat()) if (k != null) e.append(k.nodeType ? k : document.createTextNode(k));
+  return e;
+}
+const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+function fmtDate(iso) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || "");
+  return m ? `${MONTHS[+m[2] - 1]} ${+m[3]}, ${m[1]}` : (iso || "");
+}
+function safeUrl(u) { return /^https?:\/\//i.test(u || "") ? u : ""; }
+
+/* Minimal markdown renderer. HTML is escaped first, so content cannot inject markup. */
+function esc(s) { return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+function inline(s) {
+  s = esc(s);
+  s = s.replace(/`([^`]+)`/g, "<code>$1</code>");
+  s = s.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+  s = s.replace(/\*([^*]+)\*/g, "<em>$1</em>");
+  s = s.replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g, '<a href="$2">$1</a>');
+  return s;
+}
+function md(src) {
+  const out = [];
+  const lines = src.replace(/\r/g, "").split("\n");
+  let i = 0;
+  while (i < lines.length) {
+    const ln = lines[i];
+    if (!ln.trim()) { i++; continue; }
+    if (ln.startsWith("```")) {
+      const buf = []; i++;
+      while (i < lines.length && !lines[i].startsWith("```")) buf.push(lines[i++]);
+      i++;
+      out.push(`<pre><code>${esc(buf.join("\n"))}</code></pre>`);
+    } else if (ln.startsWith("## ")) {
+      out.push(`<h2>${inline(ln.slice(3))}</h2>`); i++;
+    } else if (ln.startsWith("> ")) {
+      const buf = [];
+      while (i < lines.length && lines[i].startsWith("> ")) buf.push(lines[i++].slice(2));
+      out.push(`<blockquote>${inline(buf.join(" "))}</blockquote>`);
+    } else if (/^- /.test(ln)) {
+      const buf = [];
+      while (i < lines.length && /^- /.test(lines[i])) buf.push(`<li>${inline(lines[i++].slice(2))}</li>`);
+      out.push(`<ul>${buf.join("")}</ul>`);
+    } else {
+      const buf = [];
+      while (i < lines.length && lines[i].trim() && !/^(## |> |- |```)/.test(lines[i])) buf.push(lines[i++]);
+      out.push(`<p>${inline(buf.join(" "))}</p>`);
+    }
+  }
+  return out.join("\n");
+}
+
+/* Posts added in this browser. Permanent posts live in POSTS above. */
+function localPosts() {
+  try { return JSON.parse(localStorage.getItem(LS_KEY) || "[]"); } catch (e) { return []; }
+}
+function saveLocalPosts(arr) {
+  try { localStorage.setItem(LS_KEY, JSON.stringify(arr)); return true; } catch (e) { return false; }
+}
+function detectSource(url) {
+  if (/linkedin\.com/i.test(url)) return "linkedin";
+  if (/(^|\/\/|\.)(x|twitter)\.com/i.test(url)) return "x";
+  return "other";
+}
+const state = { filter: "all", adding: false };
+
+function renderFeed() {
+  const all = [...localPosts().map(p => ({ ...p, local: true })), ...POSTS]
+    .sort((a, b) => (b.date || "").localeCompare(a.date || ""));
+  const root = el("div");
+  root.append(el("h1", { text: "Feed" }));
+  root.append(el("p", { class: "meta lede", text: "Short posts from around the web, in one place." }));
+
+  const filters = el("div", { class: "filters", role: "group", "aria-label": "Filter by source" });
+  for (const key of ["all", "linkedin", "x", "other"]) {
+    filters.append(el("button", {
+      type: "button", "aria-pressed": String(state.filter === key),
+      onclick: () => { state.filter = key; render(); }
+    }, key === "all" ? "All" : SOURCES[key]));
+  }
+  filters.append(el("span", { class: "spacer" }));
+  filters.append(el("button", {
+    type: "button", class: "linkbtn", "aria-expanded": String(state.adding),
+    onclick: () => { state.adding = !state.adding; render(); }
+  }, state.adding ? "Close" : "Add post"));
+  root.append(filters);
+
+  root.append(buildAddForm());
+
+  const list = all.filter(p => state.filter === "all" || p.source === state.filter);
+  if (!list.length) root.append(el("p", { class: "meta", text: "Nothing here yet." }));
+  for (const p of list) {
+    const link = safeUrl(p.url);
+    root.append(el("article", { class: "post" },
+      el("div", { class: "head" },
+        el("span", { class: "meta", text: fmtDate(p.date) }),
+        el("span", { class: "src", text: SOURCES[p.source] || "Note" }),
+        p.local ? el("span", { class: "meta", text: "local" }) : null,
+        link ? el("a", { class: "meta", href: link, text: "original" }) : null),
+      el("div", { class: "text", text: p.text })));
+  }
+  return root;
+}
+
+function buildAddForm() {
+  const today = new Date();
+  const iso = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+  const out = el("textarea", { id: "export-out", readonly: true, "aria-label": "Exported JSON", hidden: true });
+  const status = el("p", { class: "note", role: "status" });
+  const form = el("form", { class: "add", hidden: !state.adding, onsubmit: (e) => {
+    e.preventDefault();
+    const text = $("#f-text").value.trim();
+    const url = $("#f-url").value.trim();
+    if (!text) { status.textContent = "Paste the post text first."; return; }
+    if (url && !safeUrl(url)) { status.textContent = "The link must start with http:// or https://."; return; }
+    const sel = $("#f-source").value;
+    const post = { date: $("#f-date").value || iso, source: sel === "auto" ? detectSource(url) : sel, url, text };
+    const arr = localPosts(); arr.unshift(post);
+    if (!saveLocalPosts(arr)) { status.textContent = "This browser would not save it. Use Copy JSON after adding."; }
+    state.adding = false; render();
+  }},
+    el("label", { for: "f-text" }, "Post text", el("textarea", { id: "f-text", placeholder: "Paste the post here" })),
+    el("label", { for: "f-url" }, "Link to original (optional)", el("input", { id: "f-url", type: "url", placeholder: "https://www.linkedin.com/posts/..." })),
+    el("div", { class: "two" },
+      el("label", { for: "f-source" }, "Source",
+        el("select", { id: "f-source" },
+          el("option", { value: "auto" }, "Detect from link"),
+          el("option", { value: "linkedin" }, "LinkedIn"),
+          el("option", { value: "x" }, "X"),
+          el("option", { value: "other" }, "Note"))),
+      el("label", { for: "f-date" }, "Date", el("input", { id: "f-date", type: "date", value: iso }))),
+    el("div", { class: "btns" },
+      el("button", { class: "btn", type: "submit" }, "Add to feed"),
+      el("button", { class: "linkbtn", type: "button", onclick: async () => {
+        const arr = localPosts();
+        if (!arr.length) { status.textContent = "No local posts to export."; return; }
+        const json = arr.map(p => "  " + JSON.stringify(p)).join(",\n") + ",";
+        out.value = json; out.hidden = false;
+        try { await navigator.clipboard.writeText(json); status.textContent = "Copied. Paste it at the top of POSTS in the file to make these permanent."; }
+        catch (e) { out.select(); status.textContent = "Select and copy the text below, then paste it at the top of POSTS in the file."; }
+      }}, "Copy JSON for the file")),
+    status,
+    el("p", { class: "note", text: "Posts added here are saved in this browser only. To publish them for everyone, copy the JSON and paste it into POSTS." }),
+    out);
+  return form;
+}
+
+function renderProjects() {
+  const root = el("div");
+  root.append(el("h1", { text: "Projects" }));
+  root.append(el("p", { class: "meta lede", text: "Longer work, with write-ups." }));
+  const ul = el("ul", { class: "rows" });
+  for (const p of PROJECTS) {
+    ul.append(el("li", { class: "row" },
+      el("span", { class: "meta", text: p.year }),
+      el("div", {},
+        el("div", { class: "title" }, el("a", { href: "#project-" + p.slug, text: p.title })),
+        el("div", { class: "desc", text: p.blurb }))));
+  }
+  root.append(ul);
+  return root;
+}
+function renderProject(slug) {
+  const p = PROJECTS.find(x => x.slug === slug);
+  if (!p) return renderMissing();
+  const root = el("div");
+  root.append(el("a", { class: "back", href: "#projects", text: "← Projects" }));
+  root.append(el("h1", { text: p.title }));
+  root.append(el("div", { class: "meta", text: p.year + (p.tags.length ? "  ·  " + p.tags.join(", ") : "") }));
+  root.append(el("p", { class: "lede", style: "margin-top:12px" }, p.blurb, safeUrl(p.url) ? [" ", el("a", { href: p.url, text: "Link" })] : null));
+  const body = el("div", { class: "prose" }); body.innerHTML = md(p.body);
+  root.append(body);
+  return root;
+}
+function renderEssays() {
+  const root = el("div");
+  root.append(el("h1", { text: "Essays" }));
+  root.append(el("p", { class: "meta lede", text: "Longer writing." }));
+  const ul = el("ul", { class: "rows" });
+  for (const e of [...ESSAYS].sort((a, b) => b.date.localeCompare(a.date))) {
+    ul.append(el("li", { class: "row" },
+      el("span", { class: "meta", text: fmtDate(e.date) }),
+      el("div", {},
+        el("div", { class: "title" }, el("a", { href: "#essay-" + e.slug, text: e.title })),
+        el("div", { class: "desc", text: e.blurb }))));
+  }
+  root.append(ul);
+  return root;
+}
+function renderEssay(slug) {
+  const e = ESSAYS.find(x => x.slug === slug);
+  if (!e) return renderMissing();
+  const root = el("div");
+  root.append(el("a", { class: "back", href: "#essays", text: "← Essays" }));
+  root.append(el("h1", { text: e.title }));
+  root.append(el("div", { class: "meta", style: "margin-bottom:28px", text: fmtDate(e.date) }));
+  const body = el("div", { class: "prose" }); body.innerHTML = md(e.body);
+  root.append(body);
+  return root;
+}
+function renderHome() {
+  const root = el("div");
+  root.append(el("h1", { text: "Who am I" }));
+  const wrap = el("div", { class: "prose", style: "margin-top:20px" });
+  for (const para of SITE.about) wrap.append(el("p", { text: para }));
+  root.append(wrap);
+  const ul = el("ul", { class: "rows", style: "margin-top:24px" });
+  for (const l of SITE.links) {
+    ul.append(el("li", { class: "row" }, el("span", { class: "meta", text: l.label }), el("a", { href: l.url, text: l.url.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "") })));
+  }
+  if (SITE.email) ul.append(el("li", { class: "row" }, el("span", { class: "meta", text: "Email" }), el("span", { text: SITE.email })));
+  root.append(ul);
+  return root;
+}
+function renderMissing() {
+  return el("div", {}, el("h1", { text: "Not found" }), el("p", {}, el("a", { href: "#feed", text: "Back to the feed" })));
+}
+
+function route() {
+  const h = (location.hash || "#home").slice(1);
+  if (h.startsWith("project-")) return { nav: "projects", node: renderProject(h.slice(8)) };
+  if (h.startsWith("essay-")) return { nav: "essays", node: renderEssay(h.slice(6)) };
+  if (h === "projects") return { nav: "projects", node: renderProjects() };
+  if (h === "essays") return { nav: "essays", node: renderEssays() };
+  if (h === "feed") return { nav: "feed", node: renderFeed() };
+  return { nav: "home", node: renderHome() };
+}
+function render() {
+  const r = route();
+  view.replaceChildren(r.node);
+  document.querySelectorAll("nav a").forEach(a => {
+    if (a.dataset.nav === r.nav) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current");
+  });
+  document.title = "Suhanraj Thirumal";
+}
+window.addEventListener("hashchange", () => { window.scrollTo(0, 0); render(); });
+$("#foot").textContent = "© " + new Date().getFullYear() + " " + SITE.name;
+render();
+</script>
+</body>
+</html>
