@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<title>New post</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&display=swap">
+<style>
+/* Quick post: one column, one text box, one button. Same palette as the site. */
+:root {
+  --bg: #fdfdfc; --fg: #1c1c1b; --muted: #6c6c68; --rule: #e4e4e0; --line: #c8c8c2;
+  --link: #1d4fa3; --soft: #e8eef8; --tag: #f0f0ec; --ok: #2f7a4b; --bad: #b3261e;
+  --font: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --ui: system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --bg: #161615; --fg: #e8e8e4; --muted: #9a9a94; --rule: #2e2e2b; --line: #4a4a45; --link: #8fb4f0; --soft: #1e293b; --tag: #232321; --ok: #74c995; --bad: #f08a82; color-scheme: dark; }
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font); font-size: 18px; line-height: 1.6; }
+.wrap { max-width: 640px; margin: 0 auto; padding: 40px 20px 80px; }
+a { color: var(--link); text-underline-offset: 3px; }
+header { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 28px; font-size: 16px; }
+header a { color: var(--muted); text-decoration: none; }
+header a:hover { color: var(--fg); }
+h1 { font-size: 28px; line-height: 1.2; margin: 0 0 6px; letter-spacing: -0.015em; }
+.sub { color: var(--muted); font-size: 16px; margin: 0 0 22px; }
+label { display: block; font-family: var(--ui); font-size: 12.5px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; }
+textarea, input, select {
+  width: 100%; font: inherit; color: var(--fg); background: var(--bg);
+  border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px;
+}
+textarea:focus, input:focus, select:focus { outline: none; border-color: var(--link); box-shadow: 0 0 0 3px var(--soft); }
+textarea#text { min-height: 180px; resize: vertical; font-size: 19px; line-height: 1.6; }
+input, select { font-family: var(--ui); font-size: 15px; }
+.row { display: grid; grid-template-columns: minmax(0, 1fr) 160px 150px; gap: 12px; margin-top: 14px; }
+.actions { display: flex; align-items: center; gap: 14px; margin-top: 18px; flex-wrap: wrap; font-family: var(--ui); }
+.count { color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; margin-left: auto; }
+button { font-family: var(--ui); cursor: pointer; }
+.btn { font-size: 15px; font-weight: 600; background: var(--fg); color: var(--bg); border: 0; border-radius: 8px; padding: 10px 22px; }
+.btn:disabled { opacity: 0.45; cursor: default; }
+.btn.ghost { background: none; color: var(--fg); border: 1px solid var(--line); }
+.plain { background: none; border: 0; padding: 0; color: var(--muted); font-size: 13px; text-decoration: underline; text-underline-offset: 3px; }
+.kbd { color: var(--muted); font-size: 13px; }
+.box { border: 1px solid var(--rule); border-radius: 10px; padding: 18px; margin-top: 22px; font-family: var(--ui); font-size: 15px; line-height: 1.5; }
+.box h2 { font-family: var(--font); font-size: 19px; margin: 0 0 8px; }
+.box ol { margin: 0 0 14px; padding-left: 20px; }
+.box li { margin-bottom: 4px; }
+.box code { font-family: var(--mono); font-size: 13px; background: var(--tag); padding: 1px 5px; border-radius: 4px; }
+.steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.steps li { display: flex; gap: 10px; align-items: center; color: var(--muted); }
+.steps li::before { content: ""; width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--line); flex: none; }
+.steps li.active { color: var(--fg); }
+.steps li.active::before { border-color: var(--link); border-top-color: transparent; animation: spin 0.9s linear infinite; }
+.steps li.done { color: var(--fg); }
+.steps li.done::before { background: var(--ok); border-color: var(--ok); }
+.steps li.failed { color: var(--bad); }
+.steps li.failed::before { background: var(--bad); border-color: var(--bad); }
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .steps li.active::before { animation: none; } }
+.msg { margin: 12px 0 0; font-size: 14px; }
+.msg.bad { color: var(--bad); }
+.recent { margin-top: 40px; }
+.recent h2 { font-size: 13px; font-family: var(--ui); font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin: 0 0 4px; }
+.recent .lock { font-family: var(--ui); font-size: 13px; color: var(--muted); margin: 0 0 12px; }
+.post { border-top: 1px solid var(--rule); padding: 14px 0; }
+.post:last-child { border-bottom: 1px solid var(--rule); }
+.post .meta { font-family: var(--ui); font-size: 13px; color: var(--muted); display: flex; gap: 8px; flex-wrap: wrap; }
+.post .text { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 16.5px; margin-top: 2px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.src { font-family: var(--mono); font-size: 11.5px; background: var(--tag); padding: 1px 6px; border-radius: 3px; }
+footer { margin-top: 40px; font-family: var(--ui); font-size: 13px; color: var(--muted); display: flex; gap: 16px; flex-wrap: wrap; }
+@media (max-width: 560px) { .row { grid-template-columns: 1fr 1fr; } .row .link { grid-column: 1 / -1; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header><a href="../#feed">← Back to the feed</a><span class="kbd" id="who"></span></header>
+
+  <section id="setup" hidden>
+    <h1>Connect this device</h1>
+    <p class="sub">One-time setup. After this, posting is type and click.</p>
+    <div class="box">
+      <h2>Make a posting key on GitHub</h2>
+      <ol>
+        <li>Open <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">New fine-grained token</a> on GitHub.</li>
+        <li>Name it <code>site posting</code> and pick an expiration.</li>
+        <li>Repository access: <b>Only select repositories</b>, then <code>suhanthiru.github.io</code>.</li>
+        <li>Permissions: <b>Issues → Read and write</b>. Leave everything else at No access.</li>
+        <li>Generate it, copy it, and paste it below.</li>
+      </ol>
+      <p style="margin:0 0 14px;color:var(--muted)">This key can only open issues. It can't change any file on your site, so older content stays safe even if the key leaks. It's saved in this browser only.</p>
+      <label for="token">Posting key</label>
+      <input id="token" type="password" autocomplete="off" spellcheck="false" placeholder="github_pat_…">
+      <div class="actions"><button class="btn" id="save-token" type="button">Save and continue</button></div>
+      <p class="msg" id="setup-msg" role="status"></p>
+    </div>
+  </section>
+
+  <section id="compose" hidden>
+    <h1>New post</h1>
+    <p class="sub">Goes to the top of your feed in about a minute.</p>
+    <label for="text">Post</label>
+    <textarea id="text" placeholder="What's on your mind? Or paste a LinkedIn or X post." autofocus></textarea>
+    <div class="row">
+      <div class="link"><label for="url">Link to original (optional)</label><input id="url" type="url" placeholder="https://www.linkedin.com/posts/…"></div>
+      <div><label for="source">Source</label>
+        <select id="source">
+          <option value="auto">Detect from link</option>
+          <option value="other">Note</option>
+          <option value="linkedin">LinkedIn</option>
+          <option value="x">X</option>
+          <option value="instagram">Instagram</option>
+          <option value="threads">Threads</option>
+          <option value="bluesky">Bluesky</option>
+          <option value="youtube">YouTube</option>
+          <option value="tiktok">TikTok</option>
+          <option value="substack">Substack</option>
+        </select></div>
+      <div><label for="date">Date</label><input id="date" type="date"></div>
+    </div>
+    <div class="actions">
+      <button class="btn" id="post" type="button" disabled>Post</button>
+      <span class="kbd">or Ctrl + Enter</span>
+      <span class="count" id="count"></span>
+    </div>
+    <div class="box" id="progress" hidden>
+      <ul class="steps">
+        <li id="s-send">Sending</li>
+        <li id="s-pub">Publishing</li>
+        <li id="s-live">Live on your site</li>
+      </ul>
+      <p class="msg" id="post-msg" role="status"></p>
+    </div>
+
+    <section class="recent">
+      <h2>Recent posts</h2>
+      <p class="lock">Posts can't be edited or deleted from here. To change an older post, edit <code>posts.json</code> in the repository.</p>
+      <div id="recent"><p class="kbd">Loading…</p></div>
+    </section>
+
+    <footer><button class="plain" id="forget" type="button">Disconnect this device</button></footer>
+  </section>
+</div>
+
+<script>
+const REPO = "suhanthiru/suhanthiru.github.io";
+const KEY = "site-post-token";
+const LABELS = { linkedin: "LinkedIn", x: "X", instagram: "Instagram", threads: "Threads", bluesky: "Bluesky", youtube: "YouTube", tiktok: "TikTok", substack: "Substack", other: "Note" };
+const $ = (id) => document.getElementById(id);
+const store = {
+  get() { try { return localStorage.getItem(KEY) || ""; } catch (e) { return ""; } },
+  set(v) { try { localStorage.setItem(KEY, v); return true; } catch (e) { return false; } },
+  clear() { try { localStorage.removeItem(KEY); } catch (e) {} }
+};
+let token = store.get();
+
+function today() { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; }
+const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+function fmtDate(iso) { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || ""); return m ? `${MONTHS[+m[2] - 1]} ${+m[3]}, ${m[1]}` : (iso || ""); }
+function detect(url) {
+  const u = (url || "").toLowerCase();
+  if (u.includes("linkedin.com")) return "linkedin";
+  if (/(^|\/\/|\.)(x|twitter)\.com/.test(u)) return "x";
+  if (u.includes("instagram.com")) return "instagram";
+  if (u.includes("threads.net") || u.includes("threads.com")) return "threads";
+  if (u.includes("bsky.app")) return "bluesky";
+  if (u.includes("youtube.com") || u.includes("youtu.be")) return "youtube";
+  if (u.includes("tiktok.com")) return "tiktok";
+  if (u.includes("substack.com")) return "substack";
+  return "other";
+}
+async function gh(path, opts = {}) {
+  const r = await fetch("https://api.github.com" + path, {
+    ...opts,
+    headers: { "Accept": "application/vnd.github+json", "Authorization": "Bearer " + token, "X-GitHub-Api-Version": "2022-11-28", ...(opts.body ? { "Content-Type": "application/json" } : {}) }
+  });
+  if (!r.ok) { const e = new Error("GitHub said " + r.status); e.status = r.status; throw e; }
+  return r.status === 204 ? null : r.json();
+}
+const wait = (ms) => new Promise(r => setTimeout(r, ms));
+
+function show() {
+  $("setup").hidden = !!token;
+  $("compose").hidden = !token;
+  if (token) { $("date").value = $("date").value || today(); loadRecent(); updateCount(); $("text").focus(); }
+  else $("token").focus();
+}
+
+$("save-token").addEventListener("click", async () => {
+  const v = $("token").value.trim();
+  const msg = $("setup-msg");
+  if (!/^(github_pat_|ghp_)\w+$/.test(v)) { msg.className = "msg bad"; msg.textContent = "That doesn't look like a GitHub token. It starts with github_pat_."; return; }
+  token = v; msg.className = "msg"; msg.textContent = "Checking the key…";
+  try {
+    await gh(`/repos/${REPO}/issues?per_page=1`);
+    if (!store.set(v)) { msg.textContent = "Saved for this visit only: this browser blocks storage."; }
+    $("token").value = ""; show();
+  } catch (e) {
+    token = ""; msg.className = "msg bad";
+    msg.textContent = e.status === 401 ? "GitHub rejected that key. Copy it again, or make a new one."
+      : e.status === 404 || e.status === 403 ? "That key can't see suhanthiru.github.io. Give it access to that repository with Issues: Read and write."
+      : "Couldn't reach GitHub. Check your connection and try again.";
+  }
+});
+$("forget").addEventListener("click", () => { store.clear(); token = ""; show(); });
+
+function updateCount() {
+  const n = $("text").value.trim().length;
+  $("count").textContent = n ? `${n.toLocaleString()} characters` : "";
+  $("post").disabled = !n || busy;
+}
+$("text").addEventListener("input", updateCount);
+$("url").addEventListener("input", () => {
+  if ($("source").dataset.touched) return;
+  const u = $("url").value.trim();
+  $("source").value = u ? detect(u) : "auto";
+});
+$("source").addEventListener("change", () => { $("source").dataset.touched = "1"; });
+$("text").addEventListener("keydown", (e) => { if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) { e.preventDefault(); if (!$("post").disabled) submit(); } });
+$("post").addEventListener("click", submit);
+
+let busy = false;
+function step(id, state) { $(id).className = state; }
+async function submit() {
+  const text = $("text").value.trim();
+  const url = $("url").value.trim();
+  const msg = $("post-msg");
+  if (!text) return;
+  if (url && !/^https?:\/\/\S+$/i.test(url)) { $("progress").hidden = false; msg.className = "msg bad"; msg.textContent = "The link should start with https://"; return; }
+  const src = $("source").value;
+  const post = { text, url, source: src === "auto" ? detect(url) : src, date: $("date").value || today() };
+  busy = true; updateCount();
+  $("progress").hidden = false; msg.className = "msg"; msg.textContent = "";
+  step("s-send", "active"); step("s-pub", ""); step("s-live", "");
+
+  let issue;
+  try {
+    const title = "Post: " + text.replace(/\s+/g, " ").slice(0, 60) + (text.length > 60 ? "…" : "");
+    const body = "<!-- site-post -->\nPublished from the quick-post page. The workflow adds this to posts.json and closes the issue.\n\n```json\n" + JSON.stringify(post, null, 2) + "\n```\n";
+    issue = await gh(`/repos/${REPO}/issues`, { method: "POST", body: JSON.stringify({ title, body }) });
+  } catch (e) {
+    step("s-send", "failed"); busy = false; updateCount(); msg.className = "msg bad";
+    msg.textContent = e.status === 401 ? "Your posting key expired or was revoked. Disconnect this device below and add a new key."
+      : e.status === 403 || e.status === 404 ? "Your posting key can't open issues. Give it Issues: Read and write on suhanthiru.github.io."
+      : e.status === 410 ? "Issues are turned off for the repository. Turn them on in the repository settings."
+      : "Couldn't reach GitHub. Your text is still here; try again.";
+    return;
+  }
+  step("s-send", "done"); step("s-pub", "active");
+  $("text").value = ""; $("url").value = ""; $("source").value = "auto"; delete $("source").dataset.touched; $("date").value = today();
+  busy = false; updateCount();
+
+  const id = "gh" + issue.number;
+  const started = Date.now();
+  let published = false;
+  while (Date.now() - started < 6 * 60 * 1000) {
+    await wait(published ? 6000 : 4000);
+    try {
+      if (!published) {
+        const i = await gh(`/repos/${REPO}/issues/${issue.number}`);
+        if (i.state === "closed") { published = true; step("s-pub", "done"); step("s-live", "active"); continue; }
+        if (i.comments > 0) {
+          const cs = await gh(`/repos/${REPO}/issues/${issue.number}/comments`);
+          const bad = cs.find(c => /^Not published/.test(c.body || ""));
+          if (bad) { step("s-pub", "failed"); msg.className = "msg bad"; msg.innerHTML = ""; msg.append(bad.body + " ", Object.assign(document.createElement("a"), { href: issue.html_url, target: "_blank", rel: "noopener", textContent: "Open the issue" })); return; }
+        }
+      } else {
+        const r = await fetch("../posts.json?v=" + Date.now(), { cache: "no-store" });
+        const list = r.ok ? await r.json() : [];
+        if (Array.isArray(list) && list.some(p => p && p.id === id)) {
+          step("s-live", "done");
+          msg.innerHTML = ""; msg.append("Your post is live. ", Object.assign(document.createElement("a"), { href: "../#feed", textContent: "See it in the feed" }));
+          renderRecent(list);
+          return;
+        }
+      }
+    } catch (e) { /* keep waiting; a single failed check isn't a failure */ }
+  }
+  msg.innerHTML = "";
+  msg.append(published ? "Published. GitHub Pages is taking longer than usual; it will show up shortly. " : "Still waiting on GitHub. ",
+    Object.assign(document.createElement("a"), { href: `https://github.com/${REPO}/actions`, target: "_blank", rel: "noopener", textContent: "Check the workflow" }));
+}
+
+function renderRecent(list) {
+  const box = $("recent"); box.replaceChildren();
+  const posts = (Array.isArray(list) ? list : []).filter(p => p && typeof p.text === "string").slice(0, 5);
+  if (!posts.length) { const p = document.createElement("p"); p.className = "kbd"; p.textContent = "Nothing posted yet."; box.append(p); return; }
+  for (const p of posts) {
+    const a = document.createElement("article"); a.className = "post";
+    const meta = document.createElement("div"); meta.className = "meta";
+    const d = document.createElement("span"); d.textContent = fmtDate(p.date);
+    const s = document.createElement("span"); s.className = "src"; s.textContent = LABELS[p.source] || "Note";
+    meta.append(d, s);
+    const t = document.createElement("div"); t.className = "text"; t.textContent = p.text;
+    a.append(meta, t); box.append(a);
+  }
+}
+async function loadRecent() {
+  try { const r = await fetch("../posts.json?v=" + Date.now(), { cache: "no-store" }); renderRecent(r.ok ? await r.json() : []); }
+  catch (e) { $("recent").replaceChildren(Object.assign(document.createElement("p"), { className: "kbd", textContent: "Recent posts show here once the site is online." })); }
+}
+show();
+</script>
+</body>
+</html>

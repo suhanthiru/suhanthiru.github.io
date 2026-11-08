@@ -1,0 +1,71 @@
+# Publishes a feed post written on /post/.
+# The posting page can only open issues. This workflow turns an issue you opened
+# into a new entry at the top of posts.json, and refuses to touch any other file.
+name: Publish post
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: write
+  issues: write
+  pages: write
+
+concurrency:
+  group: publish-post
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: >-
+      github.event.issue.user.login == github.repository_owner &&
+      contains(github.event.issue.body, '<!-- site-post -->')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Add the post to posts.json
+        env:
+          ISSUE_BODY: ${{ github.event.issue.body }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ISSUE_CREATED: ${{ github.event.issue.created_at }}
+        run: node .github/scripts/add-post.mjs
+
+      - name: Commit posts.json and nothing else
+        run: |
+          if [ -z "$(git status --porcelain)" ]; then echo "Nothing new to commit."; exit 0; fi
+          if [ "$(git status --porcelain)" != " M posts.json" ] && [ "$(git status --porcelain)" != "?? posts.json" ]; then
+            echo "Only posts.json may change. Found:"; git status --porcelain
+            echo "Only posts.json may change, so nothing was published." > "$RUNNER_TEMP/post-error.txt"
+            exit 1
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add posts.json
+          git commit -m "Add feed post from issue #${{ github.event.issue.number }}"
+          for attempt in 1 2 3; do
+            git push && exit 0
+            git pull --rebase
+          done
+          echo "Couldn't push the new post." > "$RUNNER_TEMP/post-error.txt"
+          exit 1
+
+      - name: Ask GitHub Pages to rebuild
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api -X POST "repos/${{ github.repository }}/pages/builds" > /dev/null
+
+      - name: Close the issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh issue close "${{ github.event.issue.number }}" --repo "${{ github.repository }}" --comment "Published to the feed."
+
+      - name: Report a problem
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          reason="$(cat "$RUNNER_TEMP/post-error.txt" 2>/dev/null || echo 'See the workflow log for details.')"
+          gh issue comment "${{ github.event.issue.number }}" --repo "${{ github.repository }}" --body "Not published: $reason"

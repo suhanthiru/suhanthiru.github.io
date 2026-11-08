@@ -616,8 +616,7 @@ function buildContent(extraId) {
   const visible = (x) => !x.hidden || x.id === extraId;
   const uniq = new Set();
   const slug = (x, fallback) => { let s = slugify(x.title) || fallback; let n = 2; const base = s; while (uniq.has(s)) s = `${base}-${n++}`; uniq.add(s); return s; };
-  const posts = Object.values(S.posts).filter(p => (p.text || "").trim() || p.photo).sort(byDateDesc)
-    .map(p => ({ id: p.id, date: p.date || "", source: p.source || "other", url: (p.url || "").trim(), text: p.text || "", photo: p.photo || "" }));
+  const posts = []; // feed posts live in posts.json, published from /post/
   uniq.clear();
   const projects = Object.values(S.projects).filter(visible).sort(byOrder)
     .map(p => ({ id: p.id, slug: slug(p, p.id), title: p.title || "Untitled", year: p.year || "", blurb: p.blurb || "", tags: (p.tags || []).filter(Boolean), url: (p.url || "").trim(), body: p.body || "", photos: (p.photos || []).filter(id => S.photos[id]) }));
@@ -756,57 +755,14 @@ function paneSocial() {
   return out;
 }
 
-function postFields(p, save, idp) {
-  const thumb = p.photo && photoSrc(p.photo);
-  return [
-    field("Post", text(p, "text", save, { id: idp + "-text", multiline: true, rows: 4, placeholder: "Paste the text of a LinkedIn or X post, or write a note." })),
-    el("div", { class: "grid3" },
-      field("Link to original", text(p, "url", () => { if (p.sourceAuto !== false) { p.source = detectSource(p.url); const s = $("#" + idp + "-source"); if (s) s.value = p.source; } save(); }, { id: idp + "-url", type: "url", placeholder: "https://www.linkedin.com/posts/…" })),
-      field("Source", select(p, "source", POST_SOURCES, () => { p.sourceAuto = false; save(); }, { id: idp + "-source" })),
-      field("Date", text(p, "date", save, { id: idp + "-date", type: "date" }))),
-    el("div", { class: "row-actions" },
-      thumb ? el("img", { src: thumb.src, alt: "", style: "width:84px;height:56px;object-fit:cover;border-radius:6px" }) : null,
-      el("button", { type: "button", class: "btn small", text: p.photo ? "Replace photo" : "Add photo", onclick: () => pickImages(false, (ids) => { p.photo = ids[0]; save(); gcPhotos(); renderPane(); }) }),
-      p.photo ? el("button", { type: "button", class: "btn small", text: "Remove photo", onclick: () => { p.photo = ""; save(); gcPhotos(); renderPane(); } }) : null)
-  ];
-}
 function paneFeed() {
-  if (!ui.draft) ui.draft = { text: "", url: "", source: "other", date: today(), photo: "" };
-  const d = ui.draft;
-  const composer = el("section", { class: "box" }, el("h2", { text: "New post" }),
-    postFields(d, () => {}, "np"),
-    el("div", { class: "row-actions" }, el("button", { type: "button", class: "btn primary", text: "Add to feed", onclick: () => {
-      if (!d.text.trim() && !d.photo) { toast("Write or paste the post first."); $("#np-text")?.focus(); return; }
-      if (d.url && !/^https?:\/\//i.test(d.url)) { toast("The link should start with https://"); return; }
-      const id = newId();
-      S.posts[id] = { id, date: d.date || today(), source: d.source || "other", url: d.url.trim(), text: d.text, photo: d.photo };
-      persist("posts/" + id, S.posts[id], 0);
-      ui.draft = null; changed(); renderPane(); toast("Added to the feed");
-    } })));
-  const out = [head("Feed", "Short posts from LinkedIn, X and anywhere else, in one list on your site. Paste the link and the source is picked for you."), composer];
-  const posts = Object.values(S.posts).sort(byDateDesc);
-  if (!posts.length) { out.push(empty("Your feed is empty", "Posts you add above show up here, newest first.")); return out; }
-  const list = el("div", { class: "list" });
-  for (const p of posts) {
-    const save = () => { persist("posts/" + p.id, p); changed(); };
-    const open = ui.openPost === p.id;
-    const meta = el("div", { class: "meta" }, fmtDate(p.date), el("span", { class: "chip", text: POST_SOURCES[p.source] || "Note" }), p.url ? el("a", { href: p.url, target: "_blank", rel: "noopener", text: "original", style: "color:var(--accent)" }) : null);
-    if (open) {
-      list.append(el("article", { class: "item open" }, meta, postFields(p, save, "p-" + p.id),
-        el("div", { class: "row-actions" },
-          el("button", { type: "button", class: "btn small", text: "Done", onclick: () => { ui.openPost = null; renderPane(); } }),
-          el("span", { class: "spacer" }),
-          deleteBtn("Delete post", () => { delete S.posts[p.id]; persist("posts/" + p.id, null, 0); ui.openPost = null; gcPhotos(); changed(); renderPane(); }))));
-    } else {
-      const th = p.photo && photoSrc(p.photo);
-      list.append(el("article", { class: "item" },
-        el("div", { style: "min-width:0" }, meta, el("div", { class: "excerpt", text: p.text || "(photo only)" })),
-        el("div", { class: "side" }, th ? el("img", { class: "thumb", src: th.src, alt: "" }) : null,
-          el("button", { type: "button", class: "btn small", text: "Edit", onclick: () => { ui.openPost = p.id; renderPane(); } }))));
-    }
-  }
-  out.push(list);
-  return out;
+  return [
+    head("Feed", "Feed posts publish straight to your site from the quick-post page. Type, click Post, and it's live in about a minute."),
+    el("section", { class: "box" },
+      el("h2", { text: "Post something" }),
+      el("p", { style: "margin:0" }, "Open ", el("a", { href: "https://suhanthiru.github.io/post/", target: "_blank", rel: "noopener", style: "color:var(--accent);font-weight:600", text: "suhanthiru.github.io/post" }), " on your phone or laptop. Bookmark it."),
+      el("p", { class: "hint", text: "That page can only add new posts. It can't change your profile, projects, essays or older posts. To edit or remove an older post, change posts.json in the repository." }))
+  ];
 }
 
 function paneProjects() {
@@ -947,7 +903,6 @@ function panePublish() {
   const out = [head("Publish", "Your edits save here automatically. To update the live site, download a fresh index.html and put it in your site folder.")];
   out.push(el("section", { class: "box" },
     el("div", { class: "stats" },
-      el("div", {}, el("b", { text: c.posts.length }), el("span", { text: "feed posts" })),
       el("div", {}, el("b", { text: c.projects.length }), el("span", { text: "projects" })),
       el("div", {}, el("b", { text: c.essays.length }), el("span", { text: "essays" })),
       el("div", {}, el("b", { text: Object.keys(c.photos).length }), el("span", { text: "photos" })),
@@ -1020,7 +975,7 @@ async function importSite(f) {
 
 /* ---------- shell ---------- */
 function counts() {
-  return { timeline: S.timeline.length, social: S.links.length, feed: Object.keys(S.posts).length, projects: Object.keys(S.projects).length, essays: Object.keys(S.essays).length };
+  return { timeline: S.timeline.length, social: S.links.length, projects: Object.keys(S.projects).length, essays: Object.keys(S.essays).length };
 }
 function renderRail() {
   const n = counts();

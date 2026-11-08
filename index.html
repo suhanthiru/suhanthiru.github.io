@@ -182,14 +182,15 @@ footer a { color: var(--muted); }
      SITE CONTENT. Edit it with the Site Editor artifact and download
      a fresh index.html, or edit this JSON by hand.
      ============================================================ -->
-<script type="application/json" id="site-content">{"profile":{"name":"Suhanraj Thirumal","tagline":"Mathematics at Georgia Tech. Robotics software in Atlanta.","about":"I'm Suhanraj Thirumal. Most people call me Suhan.\n\nI study mathematics at Georgia Tech, concentrating in statistics and probability. I'm based in Atlanta and I work on robotics software.\n\nThis site has my short posts from other platforms, my projects, and my essays.","email":"","avatar":""},"links":[{"platform":"github","handle":"suhanthiru1925","url":"https://github.com/suhanthiru1925"}],"timeline":[{"when":"Now","title":"Robotics software","detail":"Building robotics software in Atlanta.","current":true},{"when":"Now","title":"Georgia Tech","detail":"B.S. Mathematics, concentration in statistics and probability.","current":true}],"posts":[],"projects":[],"essays":[],"photos":{}}</script>
+<script type="application/json" id="site-content">{"profile":{"name":"Suhanraj Thirumal ","tagline":"","about":"Hi! My name is Suhanraj, most people call me Suhan. \n\nI study Math at Georgia Tech. I have a wide and varied amount of interests outside of that. I am interested in the application of AI into households, low level physics and our understanding of it, interesting characters through history (nijinsky, van gogh, da vinci), and the application of physical AI and robotics into every industry possible. \n\nI become obsessed with new topics every few months, and I believe that gives me a unique perspective on every topic I come across. Also making me a pretty good dinner guest :)","email":"","avatar":""},"links":[{"platform":"x","handle":"suhanthiru1925","url":"https://x.com/suhanthiru1925"},{"platform":"linkedin","handle":"Suhanraj Thirumal","url":"https://www.linkedin.com/in/Suhanraj Thirumal"},{"platform":"instagram","handle":"suhanthiru","url":"https://www.instagram.com/suhanthiru"}],"timeline":[{"when":"Jan 2026","title":"Started at Georgia Tech","detail":"","current":true}],"posts":[],"projects":[],"essays":[],"photos":{}}</script>
 
 <script>
 const C = (() => { try { return JSON.parse(document.getElementById("site-content").textContent); } catch (e) { return {}; } })();
 const PROFILE = C.profile || {};
 const LINKS = C.links || [];
 const TIMELINE = C.timeline || [];
-const POSTS = C.posts || [];
+let POSTS = C.posts || [];
+let postsLoaded = false;
 const PROJECTS = C.projects || [];
 const ESSAYS = C.essays || [];
 const PHOTOS = C.photos || {};
@@ -350,7 +351,7 @@ function renderFeed() {
     root.append(filters);
   }
   const list = posts.filter(p => state.filter === "all" || (p.source || "other") === state.filter);
-  if (!list.length) root.append(el("p", { class: "empty", text: "No posts yet." }));
+  if (!list.length) root.append(el("p", { class: "empty", text: postsLoaded ? "No posts yet." : "Loading posts…" }));
   for (const p of list) {
     const link = safeUrl(p.url);
     const img = photo(p.photo);
@@ -489,6 +490,20 @@ const foot = $("#foot");
 foot.append(el("span", { text: "© " + new Date().getFullYear() + " " + (PROFILE.name || "") }));
 for (const l of LINKS) if (safeUrl(l.url)) foot.append(el("a", { href: l.url, rel: "me noopener", text: linkLabel(l.platform) }));
 render();
+
+/* Feed posts published from /post/ live in posts.json. */
+(async () => {
+  try {
+    const r = await fetch("posts.json", { cache: "no-cache" });
+    const extra = r.ok ? await r.json() : [];
+    if (Array.isArray(extra)) {
+      const seen = new Set(POSTS.map(p => p.id).filter(Boolean));
+      POSTS = [...extra.filter(p => p && typeof p.text === "string" && !seen.has(p.id)), ...POSTS];
+    }
+  } catch (e) { /* opened from disk, or offline: show the posts embedded above */ }
+  postsLoaded = true;
+  if (route().nav === "feed") render();
+})();
 </script>
 </body>
 </html>
