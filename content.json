@@ -1,5 +1,5 @@
 {
-  "rev": 7,
+  "rev": 8,
   "profile": {
     "name": "Suhanraj Thirumal",
     "tagline": "expanding human understanding and influence",
@@ -33,7 +33,7 @@
     {
       "when": "October 2026",
       "title": "Accepted offer at Arcadia Industries ",
-      "detail": "Building out Arcadia Industries @ Proto-Town as a Robotics SWE (Intern)",
+      "detail": "Building out Arcadia Industries @ Proto-Town, Material Abundance",
       "current": true
     },
     {
