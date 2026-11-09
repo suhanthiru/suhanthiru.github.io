@@ -1,5 +1,5 @@
 {
-  "rev": 8,
+  "rev": 9,
   "profile": {
     "name": "Suhanraj Thirumal",
     "tagline": "expanding human understanding and influence",
@@ -37,16 +37,10 @@
       "current": true
     },
     {
-      "when": "Jan 2026",
-      "title": "Started at Georgia Tech",
-      "detail": "Transferred to Gt as a Math major",
-      "current": true
-    },
-    {
       "when": "August 2024",
-      "title": "Moved to Georgia",
+      "title": "Started University",
       "detail": "",
-      "current": false
+      "current": true
     }
   ],
   "projects": [
