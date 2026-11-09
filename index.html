@@ -69,8 +69,9 @@ ul.rows { list-style: none; margin: 0; padding: 0; }
 .home { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 64px; align-items: start; }
 .home-main { min-width: 0; max-width: 640px; }
 .tagline { color: var(--muted); font-size: 19px; margin: 0 0 24px; }
-.who-head { display: flex; gap: 16px; align-items: center; margin-bottom: 8px; }
-.who-head .avatar { width: 64px; height: 64px; font-size: 20px; }
+.who-head { display: flex; gap: 24px; align-items: center; margin-bottom: 12px; }
+.who-head .avatar { width: 128px; height: 128px; font-size: 36px; }
+@media (max-width: 560px) { .who-head { gap: 18px; } .who-head .avatar { width: 96px; height: 96px; font-size: 28px; } }
 .tl-wrap { padding-top: 6px; }
 .tl { list-style: none; margin: 0; padding: 0; }
 .tl li { position: relative; padding: 0 0 24px 28px; }
