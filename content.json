@@ -1,5 +1,5 @@
 {
-  "rev": 3,
+  "rev": 4,
   "profile": {
     "name": "Suhanraj Thirumal",
     "tagline": "expanding human understanding and influence",
@@ -50,6 +50,20 @@
     }
   ],
   "projects": [
+    {
+      "id": "mw8mgzjyznf9p",
+      "title": "Javier",
+      "year": "2026",
+      "blurb": "Custom LLM Agent, post trained using LoRA on device JSONs, build to work agnostically across hardware",
+      "tags": [
+        "assitents",
+        "custom software"
+      ],
+      "url": "",
+      "body": "TBD",
+      "photos": [],
+      "hidden": false
+    },
     {
       "id": "mw8m8nye2t6hw",
       "title": "Lecteur",
