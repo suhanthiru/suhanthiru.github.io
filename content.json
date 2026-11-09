@@ -1,5 +1,5 @@
 {
-  "rev": 4,
+  "rev": 5,
   "profile": {
     "name": "Suhanraj Thirumal",
     "tagline": "expanding human understanding and influence",
@@ -51,12 +51,25 @@
   ],
   "projects": [
     {
+      "id": "mw8mkwsaxuaut",
+      "title": "SO-101",
+      "year": "2026",
+      "blurb": "Open-source robotic arm, 3d printed from scratch, built to teach myself data pipelining, imitation and reinforcement learning, and patience",
+      "tags": [
+        "robotics"
+      ],
+      "url": "",
+      "body": "TBD",
+      "photos": [],
+      "hidden": false
+    },
+    {
       "id": "mw8mgzjyznf9p",
       "title": "Javier",
       "year": "2026",
       "blurb": "Custom LLM Agent, post trained using LoRA on device JSONs, build to work agnostically across hardware",
       "tags": [
-        "assitents",
+        "assistants",
         "custom software"
       ],
       "url": "",
