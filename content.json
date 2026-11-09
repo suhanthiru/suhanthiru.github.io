@@ -1,5 +1,5 @@
 {
-  "rev": 1,
+  "rev": 2,
   "profile": {
     "name": "Suhanraj Thirumal",
     "tagline": "",
@@ -34,5 +34,10 @@
   ],
   "projects": [],
   "essays": [],
-  "photos": {}
+  "photos": {
+    "mw8iw3t9h1kx2": {
+      "src": "images/mw8iw3t9h1kx2.jpg",
+      "caption": ""
+    }
+  }
 }
