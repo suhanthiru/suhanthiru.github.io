@@ -1,11 +1,11 @@
 {
-  "rev": 2,
+  "rev": 3,
   "profile": {
     "name": "Suhanraj Thirumal",
-    "tagline": "",
+    "tagline": "expanding human understanding and influence",
     "about": "Hi! My name is Suhanraj, most people call me Suhan. \n\nI study Math at Georgia Tech. I have a wide and varied amount of interests outside of that. I am interested in the application of AI into households, low level physics and our understanding of it, interesting characters through history (nijinsky, van gogh, da vinci), and the application of physical AI and robotics into every industry possible. \n\nI become obsessed with new topics every few months, and I believe that gives me a unique perspective on every topic I come across. Also making me a pretty good dinner guest :)",
     "email": "",
-    "avatar": ""
+    "avatar": "mw8ip5smv2g1v"
   },
   "links": [
     {
@@ -21,22 +21,68 @@
     {
       "platform": "instagram",
       "handle": "suhanthiru",
-      "url": "https://www.instagram.com/suhanthiru"
+      "url": ""
+    },
+    {
+      "platform": "github",
+      "handle": "suhanthiru",
+      "url": "https://github.com/suhanthiru"
     }
   ],
   "timeline": [
     {
+      "when": "October 2026",
+      "title": "Accepted offer at Arcadia Industries ",
+      "detail": "Building out Arcadia Industries @ Proto-Town as a Robotics SWE (Intern)",
+      "current": true
+    },
+    {
       "when": "Jan 2026",
       "title": "Started at Georgia Tech",
-      "detail": "",
+      "detail": "Transferred to Gt as a Math major",
       "current": true
+    },
+    {
+      "when": "August 2024",
+      "title": "Moved to Georgia",
+      "detail": "",
+      "current": false
     }
   ],
-  "projects": [],
-  "essays": [],
+  "projects": [
+    {
+      "id": "mw8m8nye2t6hw",
+      "title": "Lecteur",
+      "year": "2026",
+      "blurb": "Custom software for a Kindle Oasis to provide offline AI descriptions and for complex research papers, including text, visuals, and LaTeX equations",
+      "tags": [
+        "learning",
+        "custom software"
+      ],
+      "url": "https://github.com/suhanthiru/doc_tool",
+      "body": "TBD",
+      "photos": [],
+      "hidden": false
+    }
+  ],
+  "essays": [
+    {
+      "id": "mw8iyqj7qapjh",
+      "title": "My Favorite Years in History",
+      "subtitle": "Discoveries, Catalysts, and the Rise and Fall of Eras",
+      "date": "2026-11-08",
+      "cover": "",
+      "body": "Pre-Print",
+      "hidden": false
+    }
+  ],
   "photos": {
     "mw8iw3t9h1kx2": {
       "src": "images/mw8iw3t9h1kx2.jpg",
+      "caption": ""
+    },
+    "mw8ip5smv2g1v": {
+      "src": "images/mw8ip5smv2g1v.jpg",
       "caption": ""
     }
   }
